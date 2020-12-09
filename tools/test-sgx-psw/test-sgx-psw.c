@@ -19,6 +19,10 @@
 
 void check_sgx(){
 	const char * sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
+	if(sgx_sdk_dir == NULL){
+		sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
+	}
+
 	const char * sgx_urts_subdir = "/lib64/libsgx_urts.so";
 
 	const size_t sgx_sdk_dir_len = strlen(sgx_sdk_dir);
