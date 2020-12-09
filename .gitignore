@@ -1,0 +1,48 @@
+/build
+
+# No editor backup files.
+*.sw*
+*.backup
+*.orig
+\#*#
+*~
+
+.lib
+*.i
+*.s
+*.e
+*.d
+pal.map
+
+# object file/libraries
+*.a
+*.o
+*.so
+*.so.*
+
+# python
+*.py[co]
+__pycache__
+
+# sgx
+*.manifest.sgx
+*.sig
+*.token
+*.cached
+.output.sgx_get_token.*
+.output.sgx_sign.*
+
+# gnu global
+GPATH
+GTAGS
+GSYMS
+GRTAGS
+
+# tags/etags
+tags
+TAGS
+
+# cscope
+cscope.*
+ncscope.*
+*cscope*
