@@ -1,3 +1,10 @@
+#ifdef DEBUG
+	#undef DEBUG
+	#define DEBUG(fmt, ...) (printf(fmt, ##__VA_ARGS__))
+#else
+	#define DEBUG
+#endif
+
 #include <stdio.h>
 #include <dlfcn.h>
 
@@ -6,6 +13,8 @@
 
 void check_sgx(){
 	void * sgx_urts = dlopen("/home/gylee/infotracking/sgxsdk/lib64/libsgx_urts.so", RTLD_NOW);
+
+	DEBUG("libsgx_urts.so loaded at %p\n", sgx_urts);
 
 	dlclose(sgx_urts);
 }
