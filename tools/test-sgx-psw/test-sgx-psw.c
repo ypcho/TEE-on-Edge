@@ -18,7 +18,7 @@
 //reference: https://software.intel.com/content/www/us/en/develop/articles/properly-detecting-intel-software-guard-extensions-in-your-applications.html
 
 void check_sgx(){
-	const char * sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
+	const char * sgx_sdk_dir = getenv("SGX_SDK");
 	if(sgx_sdk_dir == NULL){
 		sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
 	}
