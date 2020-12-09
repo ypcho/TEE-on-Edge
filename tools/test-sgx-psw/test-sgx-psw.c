@@ -10,12 +10,17 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <dlfcn.h>
 
 //based on the following reference from intel
 //reference: https://software.intel.com/content/www/us/en/develop/articles/properly-detecting-intel-software-guard-extensions-in-your-applications.html
 
 void check_sgx(){
+	const char * sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
+	const char * sgx_urts_subdir = "/lib64/libsgx_urts.so";
+
 	void * sgx_urts = dlopen("/home/gylee/infotracking/sgxsdk/lib64/libsgx_urts.so", RTLD_NOW);
 
 	DEBUG("libsgx_urts.so loaded at %p\n", sgx_urts);
