@@ -21,6 +21,8 @@ void check_sgx(){
 	const char * sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
 	const char * sgx_urts_subdir = "/lib64/libsgx_urts.so";
 
+    const size_t sgx_sdk_dir_len = strlen(sgx_sdk_dir);
+
 	void * sgx_urts = dlopen("/home/gylee/infotracking/sgxsdk/lib64/libsgx_urts.so", RTLD_NOW);
 
 	DEBUG("libsgx_urts.so loaded at %p\n", sgx_urts);
