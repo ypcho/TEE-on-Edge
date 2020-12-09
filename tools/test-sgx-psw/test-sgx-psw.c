@@ -1,3 +1,7 @@
+// This source is under development
+
+#define DEBUG
+
 #ifdef DEBUG
 	#undef DEBUG
 	#define DEBUG(fmt, ...) (printf(fmt, ##__VA_ARGS__))
