@@ -29,6 +29,7 @@ void check_sgx(){
 	strcpy(&sgx_urts_dir[sgx_sdk_dir_len], sgx_urts_subdir);
 
 	void * sgx_urts = dlopen(sgx_urts_dir, RTLD_NOW);
+	free(sgx_urts_dir);
 
 	DEBUG("libsgx_urts.so loaded at %p\n", sgx_urts);
 	
