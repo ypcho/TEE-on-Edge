@@ -25,6 +25,7 @@ void check_sgx(){
 	const size_t sgx_urts_subdir_len = strlen(sgx_urts_subdir);
 
 	char * sgx_urts_dir = malloc(sgx_sdk_dir_len + sgx_urts_subdir_len + 1);
+	strcpy(sgx_urts_dir, sgx_sdk_dir);
 
 	void * sgx_urts = dlopen("/home/gylee/infotracking/sgxsdk/lib64/libsgx_urts.so", RTLD_NOW);
 
