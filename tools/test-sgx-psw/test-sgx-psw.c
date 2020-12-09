@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+//based on the following reference from intel
+//reference: https://software.intel.com/content/www/us/en/develop/articles/properly-detecting-intel-software-guard-extensions-in-your-applications.html
+
 void check_sgx(){
 
 }
