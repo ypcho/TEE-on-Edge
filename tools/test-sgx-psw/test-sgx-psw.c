@@ -20,7 +20,7 @@
 char * getlibpath(const char * lib_subdir){
 	const char * sgx_sdk_dir = getenv("SGX_SDK");
 	if(sgx_sdk_dir == NULL){
-		sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
+		return NULL;
 	}
 
 	const size_t sgx_sdk_dir_len = strlen(sgx_sdk_dir);
@@ -37,6 +37,9 @@ char * getlibpath(const char * lib_subdir){
 void check_sgx(){
 
 	char * sgx_urts_dir = getlibpath("/lib64/libsgx_urts.so");
+	if(sgx_urts_dir == NULL)
+		return;
+
 	void * sgx_urts = dlopen(sgx_urts_dir, RTLD_NOW);
 
 	DEBUG("libsgx_urts.so loaded at %p\n", sgx_urts);
