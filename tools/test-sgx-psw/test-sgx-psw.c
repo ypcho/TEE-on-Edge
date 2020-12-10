@@ -31,6 +31,7 @@ void check_sgx(){
 	char * sgx_urts_dir = malloc(sgx_sdk_dir_len + sgx_urts_subdir_len + 1);
 	strcpy(sgx_urts_dir, sgx_sdk_dir);
 	strcpy(&sgx_urts_dir[sgx_sdk_dir_len], sgx_urts_subdir);
+	printf("libsgx_urts.so directory %s\n", sgx_urts_dir);
 
 	void * sgx_urts = dlopen(sgx_urts_dir, RTLD_NOW);
 	free(sgx_urts_dir);
