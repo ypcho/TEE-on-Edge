@@ -19,7 +19,7 @@
 
 char * getlibpath(const char * lib_subdir){
 	const char * sgx_sdk_dir = getenv("SGX_SDK");
-	if(sgx_sdk_dir == NULL){
+	if(sgx_sdk_dir == NULL || strlen(sgx_sdk_dir) == 0){
 		printf("SGX_SDK environment variable is not set.\n");
 		printf("please set the environment variable and try again.\n");
 		return NULL;
