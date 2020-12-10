@@ -1,6 +1,6 @@
 
 LDFLAGS += -ldl
-CFLAGS += -g
+
 
 default: test-sgx-psw
 
