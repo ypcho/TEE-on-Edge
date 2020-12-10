@@ -17,7 +17,7 @@
 //based on the following reference from intel
 //reference: https://software.intel.com/content/www/us/en/develop/articles/properly-detecting-intel-software-guard-extensions-in-your-applications.html
 
-void check_sgx(){
+char * getlibpath(const char * lib){
 	const char * sgx_sdk_dir = getenv("SGX_SDK");
 	if(sgx_sdk_dir == NULL){
 		sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
@@ -31,12 +31,19 @@ void check_sgx(){
 	char * sgx_urts_dir = malloc(sgx_sdk_dir_len + sgx_urts_subdir_len + 1);
 	strcpy(sgx_urts_dir, sgx_sdk_dir);
 	strcpy(&sgx_urts_dir[sgx_sdk_dir_len], sgx_urts_subdir);
-	printf("libsgx_urts.so directory %s\n", sgx_urts_dir);
 
+	return sgx_urts_dir;
+}
+	
+
+void check_sgx(){
+
+	char * sgx_urts_dir = getlibpath("/lib64/libsgx_urts.so");
 	void * sgx_urts = dlopen(sgx_urts_dir, RTLD_NOW);
-	free(sgx_urts_dir);
 
 	DEBUG("libsgx_urts.so loaded at %p\n", sgx_urts);
+	printf("libsgx_urts.so directory %s\n", sgx_urts_dir);
+	free(sgx_urts_dir);
 	
 	dlclose(sgx_urts);
 }
