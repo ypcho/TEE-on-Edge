@@ -17,22 +17,20 @@
 //based on the following reference from intel
 //reference: https://software.intel.com/content/www/us/en/develop/articles/properly-detecting-intel-software-guard-extensions-in-your-applications.html
 
-char * getlibpath(const char * lib){
+char * getlibpath(const char * lib_subdir){
 	const char * sgx_sdk_dir = getenv("SGX_SDK");
 	if(sgx_sdk_dir == NULL){
 		sgx_sdk_dir = "/home/gylee/infotracking/sgxsdk";
 	}
 
-	const char * sgx_urts_subdir = "/lib64/libsgx_urts.so";
-
 	const size_t sgx_sdk_dir_len = strlen(sgx_sdk_dir);
-	const size_t sgx_urts_subdir_len = strlen(sgx_urts_subdir);
+	const size_t lib_subdir_len = strlen(lib_subdir);
 
-	char * sgx_urts_dir = malloc(sgx_sdk_dir_len + sgx_urts_subdir_len + 1);
-	strcpy(sgx_urts_dir, sgx_sdk_dir);
-	strcpy(&sgx_urts_dir[sgx_sdk_dir_len], sgx_urts_subdir);
+	char * lib_dir = malloc(sgx_sdk_dir_len + lib_subdir_len + 1);
+	strcpy(lib_dir, sgx_sdk_dir);
+	strcpy(&lib_dir[sgx_sdk_dir_len], lib_subdir);
 
-	return sgx_urts_dir;
+	return lib_dir;
 }
 	
 
