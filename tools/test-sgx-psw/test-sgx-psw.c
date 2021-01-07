@@ -17,7 +17,7 @@
 //based on the following reference from intel
 //reference: https://software.intel.com/content/www/us/en/develop/articles/properly-detecting-intel-software-guard-extensions-in-your-applications.html
 
-char * getlibpath(const char * lib_subdir){
+void * getlibsdk(const char * lib_subdir){
 	const char * sgx_sdk_dir = getenv("SGX_SDK");
 	if(sgx_sdk_dir == NULL || strlen(sgx_sdk_dir) == 0){
 		printf("SGX_SDK environment variable is not set.\n");
@@ -31,22 +31,22 @@ char * getlibpath(const char * lib_subdir){
 	char * lib_dir = malloc(sgx_sdk_dir_len + lib_subdir_len + 1);
 	strcpy(lib_dir, sgx_sdk_dir);
 	strcpy(&lib_dir[sgx_sdk_dir_len], lib_subdir);
+	DEBUG("lib subpath %s translated to full path %s\n", lib_subdir, lib_dir);
 
-	return lib_dir;
+	void * lib = dlopen(lib_dir, RTLD_NOW); // TO BE MODIFIED: RTLD_LAZY
+	
+	free(lib_dir);
+	
+	return lib;
 }
 	
 
 void check_sgx(){
-
-	char * sgx_urts_dir = getlibpath("/lib64/libsgx_urts.so");
-	if(sgx_urts_dir == NULL)
+	void * sgx_urts = getlibsdk("/lib64/libsgx_urts.so");
+	if(sgx_urts == NULL)
 		return;
 
-	void * sgx_urts = dlopen(sgx_urts_dir, RTLD_NOW);
-
 	DEBUG("libsgx_urts.so loaded at %p\n", sgx_urts);
-	printf("libsgx_urts.so directory %s\n", sgx_urts_dir);
-	free(sgx_urts_dir);
 	
 	dlclose(sgx_urts);
 }
