@@ -39,6 +39,21 @@ void * getlibsdk(const char * lib_subdir){
 	
 	return lib;
 }
+
+static void * liburts;
+
+void getlibpsw(){
+	//libsgx_urts.so
+
+	liburts = dlopen("/usr/lib/libsgx_urts.so", RTLD_NOW);
+	if(liburts == NULL){
+		liburts = dlopen("/usr/lib64/libsgx_urts.so", RTLD_NOW);
+	}
+	if(liburts == NULL){
+		printf("unable to find libsgx_urts.so\n");
+		printf("Did you install SGX PSW?\n");
+	}
+}
 	
 
 void check_sgx(){
