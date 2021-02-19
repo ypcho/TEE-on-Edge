@@ -25,8 +25,8 @@ finish-docker:
 	docker network rm testbridge
 
 run-docker:
-	docker run --net=testbridge --ip=$(TESTBRIDGE_SERVER) python-communicate python3 /communicate/server.py & \
-	docker run --net=testbridge --env SERVERIP=$(TESTBRIDGE_SERVER) python-communicate python3 /communicate/client.py
+	docker run --net=testbridge --ip=$(TESTBRIDGE_SERVER) python-communicate-server & \
+	docker run --net=testbridge --env SERVERIP=$(TESTBRIDGE_SERVER) python-communicate-client
 
 .PHONY: all-image
 all-image: python-communicate python-communicate-server python-communicate-client
