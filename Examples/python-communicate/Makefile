@@ -1,11 +1,13 @@
 
-.PHONY: clean clean-container
-clean:
-	-docker image rm -f python-communicate
-	-docker image rm $$(docker images -f dangling=true -q)
+.PHONY: clean-image clean-container
+clean-image:
+	docker image rm -f $$(docker image ls -f dangling=true -q) \
+				$$(docker image ls -f reference=python-communicate-server -q) \
+				$$(docker image ls -f reference=python-communicate-client -q) \
+				$$(docker image ls -f reference=python-communicate -q)
 
 clean-container:
-	-docker container rm -f $$(docker container ls -q -f ancestor=python-communicate)
+	docker container rm -f $$(docker container ls -q -f ancestor=python-communicate)
 
 .PHONY: run-simple
 run-simple:
@@ -26,6 +28,17 @@ run-docker:
 	docker run --net=testbridge --ip=$(TESTBRIDGE_SERVER) python-communicate python3 /communicate/server.py & \
 	docker run --net=testbridge --env SERVERIP=$(TESTBRIDGE_SERVER) python-communicate python3 /communicate/client.py
 
+.PHONY: all-image
+all-image: python-communicate python-communicate-server python-communicate-client
+
 .PHONY: python-communicate
 python-communicate: Dockerfile.base
+	docker build -t $@ -f $< .
+
+.PHONY: python-communicate-server
+python-communicate-server: Dockerfile.server python-communicate
+	docker build -t $@ -f $< .
+
+.PHONY: python-communicate-client
+python-communicate-client: Dockerfile.client python-communicate
 	docker build -t $@ -f $< .
