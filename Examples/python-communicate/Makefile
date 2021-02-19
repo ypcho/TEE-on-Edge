@@ -2,6 +2,7 @@
 .PHONY: clean
 clean:
 	-docker image rm -f python-communicate
+	-docker image rm $$(docker images -f dangling=true -q)
 
 .PHONY: run-simple
 run-simple:
