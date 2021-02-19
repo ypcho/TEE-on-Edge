@@ -1,8 +1,11 @@
 
-.PHONY: clean
+.PHONY: clean clean-container
 clean:
 	-docker image rm -f python-communicate
 	-docker image rm $$(docker images -f dangling=true -q)
+
+clean-container:
+	-docker container rm -f $$(docker container ls -q -f ancestor=python-communicate)
 
 .PHONY: run-simple
 run-simple:
