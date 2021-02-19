@@ -1,0 +1,10 @@
+sgx.enclave_size = "4G"
+sgx.thread_num = 8
+
+# User scripts
+sgx.trusted_files.userscript00 = "file:/communicate/hellopython.py"
+sgx.trusted_files.userscript01 = "file:/communicate/server.py"
+sgx.trusted_files.userscript02 = "file:/communicate/client.py"
+
+# Allocate Server IP
+loader.env.SERVERIP = "10.98.0.254"
