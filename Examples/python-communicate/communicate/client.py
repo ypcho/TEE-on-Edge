@@ -2,24 +2,30 @@
 
 import socket
 import os
+import time
 
 if "SERVERIP" in os.environ:
 	ip = os.environ["SERVERIP"]
 else:
 	ip = "127.0.0.1"
 
-try:
-	sock = socket.socket()
-	sock.connect((ip, 11111))
-except:
-	print(f"failed to connect at {ip}", flush=True)
-	exit(-1)
-else:
-	print(f"successfully connected at {ip}", flush=True)
+port = 11111
+repeattime = 10 #[seconds]
 
-sock.send(b"Sample message from simple client")
+while True:
+	try:
+		sock = socket.socket()
+		sock.connect((ip, port))
+	except:
+		print(f"failed to connect at {ip}", flush=True)
+		exit(-1)
+	else:
+		print(f"successfully connected at {ip}", flush=True)
 
-msg = sock.recv(0x100)
-print("client:", msg.decode(), flush=True)
+	sock.send(b"Sample message from simple client")
 
-sock.close()
+	msg = sock.recv(0x100)
+	print("client:", msg.decode(), flush=True)
+
+	sock.close()
+	time.sleep(repeattime)
