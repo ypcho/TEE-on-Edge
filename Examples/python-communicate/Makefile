@@ -1,3 +1,4 @@
+mkfile_path := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 .PHONY: clean-image clean-container
 clean-image:
@@ -42,3 +43,14 @@ python-communicate-server: Dockerfile.server python-communicate
 .PHONY: python-communicate-client
 python-communicate-client: Dockerfile.client python-communicate
 	docker build -t $@ -f $< .
+
+GSCFLAGS := -c $(mkfile_path)/config.yaml
+
+.PHONY: gsc-python-communicate-unsigned
+gsc-python-communicate-unsigned: python-communicate
+	cd gsc; ./gsc build --insecure-args $< $(mkfile_path)/python-communicate.manifest $(GSCFLAGS)
+
+.PHONY: gsc-python-communicate
+gsc-python-communicate: gsc-python-communicate-unsigned
+	openssl genrsa -3 -out signkey/$@-key.pem 3072
+	cd gsc; ./gsc sign-image python-communicate $(mkfile_path)/signkey/$@-key.pem $(GSCFLAGS)
