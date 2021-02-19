@@ -2,16 +2,22 @@
 
 import socket
 
+iplisten = "0.0.0.0"
+port = 11111
+
 sock = socket.socket()
-sock.bind(("0.0.0.0", 11111))
+sock.bind((iplisten, port))
 
 sock.listen(1)
 
-conn, addr = sock.accept()
+print(f"server listening to {iplisten}:{port}", flush=True)
 
-conn.send(b"Response from simple server")
+while True:
+	conn, addr = sock.accept()
 
-data = conn.recv(0x100)
-print("server:", data.decode())
+	conn.send(b"Response from simple server")
 
-conn.close()
+	data = conn.recv(0x100)
+	print("server:", data.decode(), flush=True)
+
+	conn.close()
