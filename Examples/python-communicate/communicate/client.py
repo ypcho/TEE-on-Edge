@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 
 import socket
+import os
+
+if "SERVERIP" in os.environ:
+	ip = os.environ["SERVERIP"]
+else:
+	ip = "127.0.0.1"
 
 sock = socket.socket()
-sock.connect(("127.0.0.1", 11111))
+sock.connect((ip, 11111))
 
 sock.send(b"Sample message from simple client")
 
