@@ -27,8 +27,8 @@ run-simple:
 	python3 communicate/server.py & \
 	python3 communicate/client.py
 
-TESTBRIDGE_SUBNET := 172.31.0.0/16
-TESTBRIDGE_SERVER := 172.31.0.254
+TESTBRIDGE_SUBNET := 10.98.0.0/16
+TESTBRIDGE_SERVER := 10.98.0.254
 
 .PHONY: init-docker finish-docker run-docker
 init-docker:
@@ -37,9 +37,15 @@ init-docker:
 finish-docker:
 	docker network rm testbridge
 
+RUNDOCKERFLAGS :=
 run-docker:
-	docker run --net=testbridge --ip=$(TESTBRIDGE_SERVER) python-communicate-server & \
-	docker run --net=testbridge --env SERVERIP=$(TESTBRIDGE_SERVER) python-communicate-client
+	docker run $(RUNDOCKERFLAGS) --net=testbridge --ip=$(TESTBRIDGE_SERVER) python-communicate-server & \
+	docker run $(RUNDOCKERFLAGS) --net=testbridge --env SERVERIP=$(TESTBRIDGE_SERVER) python-communicate-client
+
+run-gsc-docker: RUNDOCKERFLAGS += --device=/dev/sgx --volume=/var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket
+run-gsc-docker:
+	docker run $(RUNDOCKERFLAGS) --net=testbridge --ip=$(TESTBRIDGE_SERVER) gsc-python-communicate-server & \
+	docker run $(RUNDOCKERFLAGS) --net=testbridge --env SERVERIP=$(TESTBRIDGE_SERVER) gsc-python-communicate-client
 
 #generic rule
 .PHONY: build-image-% build-gsc-unsigned-image-% build-gsc-image-%
