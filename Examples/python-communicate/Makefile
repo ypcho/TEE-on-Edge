@@ -6,6 +6,7 @@ clean-image:
 				$$(docker image ls -f reference=python-communicate-server -q) \
 				$$(docker image ls -f reference=python-communicate-client -q) \
 				$$(docker image ls -f reference=python-communicate -q)
+	rm -rf signkey
 
 clean-container:
 	docker container rm -f $$(docker container ls -q -f ancestor=python-communicate)
