@@ -1,12 +1,20 @@
 mkfile_path := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 .PHONY: clean-image clean-container
-clean-image:
-	docker image rm -f $$(docker image ls -f dangling=true -q) \
-				$$(docker image ls -f reference=python-communicate-server -q) \
-				$$(docker image ls -f reference=python-communicate-client -q) \
-				$$(docker image ls -f reference=python-communicate -q)
+clean-image: clean-python-communicate-server clean-python-communicate-client clean-python-communicate
+	#docker image rm -f $$(docker image ls -f dangling=true -q)
 	rm -rf signkey
+
+clean-python-communicate: clean-python-communicate-server clean-python-communicate-client do-clean-python-communicate
+
+clean-python-communicate-server: do-clean-python-communicate-server
+
+clean-python-communicate-client: do-clean-python-communicate-client
+
+do-clean-%:
+	-docker image rm -f $$(docker image ls -f reference=gsc-$(patsubst do-clean-%,%,$@) -q) 2>/dev/null
+	-docker image rm -f $$(docker image ls -f reference=gsc-$(patsubst do-clean-%,%,$@)-unsigned -q) 2>/dev/null
+	-docker image rm -f $$(docker image ls -f reference=$(patsubst do-clean-%,%,$@) -q) #2>/dev/null
 
 clean-container:
 	docker container rm -f $$(docker container ls -q -f ancestor=python-communicate)
