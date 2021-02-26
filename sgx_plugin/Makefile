@@ -1,2 +1,3 @@
 
-BRANCH := e4dc4c122dda5ee577252da5a670d837f90b52ef
+intel-sgx-plugin:
+	cd intel-device-plugins-for-kubernetes ; make $@
