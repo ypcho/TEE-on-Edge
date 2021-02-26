@@ -1,8 +1,11 @@
 
 .DEFAULT_GOAL: run
-.PHONY: run
+.PHONY: run stop
 run: intel-sgx-plugin
 	kubectl apply -f intel-sgx-plugin.yaml
+
+stop:
+	kubectl delete -f intel-sgx-plugin.yaml
 
 .PHONY: set-docker-env
 set-docker-env:
