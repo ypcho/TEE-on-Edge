@@ -1,3 +1,6 @@
 [submodule "graphene"]
 	path = graphene
 	url = https://github.com/oscarlab/graphene
+[submodule "sgx_plugin/intel-device-plugins-for-kubernetes"]
+	path = sgx_plugin/intel-device-plugins-for-kubernetes
+	url = https://github.com/intel/intel-device-plugins-for-kubernetes
