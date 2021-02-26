@@ -7,13 +7,9 @@ run: intel-sgx-plugin
 stop:
 	kubectl delete -f intel-sgx-plugin.yaml
 
-.PHONY: set-docker-env
-set-docker-env:
-	eval $(minikube docker-env)
-
 .PHONY: intel-sgx-plugin intel-sgx-initcontainer
-intel-sgx-plugin: set-docker-env
+intel-sgx-plugin:
 	cd intel-device-plugins-for-kubernetes ; make $@
 
-intel-sgx-initcontainer: set-docker-env
+intel-sgx-initcontainer:
 	cd intel-device-plugins-for-kubernetes ; make $@
