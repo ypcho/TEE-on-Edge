@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: gsc-client
+    labels:
+        run: gsc-client
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            run: gsc-client
+    template:
+        metadata:
+            labels:
+                run: gsc-client
+        spec:
+            containers:
+              - name: gsc-client
+                image: gsc-python-communicate-client
+                imagePullPolicy: Never
+                volumeMounts:
+                  - name: gsc-aesmd
+                    mountPath: /var/run/aesmd/aesm.socket
+                #assume device plugin enabled
+                resources:
+                    limits:
+                        sgx.intel.com/enclave: 1
+                        sgx.intel.com/provision: 1
+            volumes:
+              - name: gsc-aesmd
+                hostPath:
+                    path: /var/run/aesmd/aesm.socket
+            restartPolicy: Always
+...
