@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: gsc-simpleserver
+    labels:
+        run: gsc-simpleserver
+spec:
+    containers:
+      - name: gsc-simpleserver
+        image: gsc-python-communicate-server
+        imagePullPolicy: Never
+        volumeMounts:
+          - name: gsc-aesmd
+            mountPath: /var/run/aesmd/aesm.socket
+        #assume device plugin enabled
+        resources:
+            limits:
+                sgx.intel.com/enclave: 1
+                sgx.intel.com/provision: 1
+    volumes:
+      - name: gsc-aesmd
+        hostPath:
+            path: /var/run/aesmd/aesm.socket
+    restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: gsc-simpleserver-service
+spec:
+    clusterIP: 10.98.0.254
+    ports:
+      - name: gsc-simpleserver-service-port
+        protocol: TCP
+        port: 11111
+        targetPort: 11111
+    selector:
+        run: gsc-simpleserver
+...
