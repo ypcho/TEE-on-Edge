@@ -1,24 +1,22 @@
 mkfile_path := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
+GSCFLAGS := $(GSCFLAGS) -c $(mkfile_path)/config.yaml
+GSCBUILDFLAGS := 
+
+include $(mkfile_path)/../../scripts/buildgsc.Makefile
+
 .DEFAULT_GOAL := all
 
 .PHONY: clean-image clean-container
 clean-image: clean-python-communicate-server clean-python-communicate-client clean-python-communicate
 	rm -rf signkey
 
-clean-python-communicate: clean-python-communicate-server clean-python-communicate-client do-clean-python-communicate
+clean-python-communicate: clean-python-communicate-server clean-python-communicate-client clean-image-python-communicate
 
-clean-python-communicate-server: do-clean-python-communicate-server
+clean-python-communicate-server: clean-image-python-communicate-server
 
-clean-python-communicate-client: do-clean-python-communicate-client
+clean-python-communicate-client: clean-image-python-communicate-client
 
-#generic rule
-do-clean-%:
-	-docker image rm -f $$(docker image ls -f reference=gsc-$(patsubst do-clean-%,%,$@) -q) 2>/dev/null
-	-docker image rm -f $$(docker image ls -f reference=gsc-$(patsubst do-clean-%,%,$@)-unsigned -q) 2>/dev/null
-	-docker image rm -f $$(docker image ls -f reference=$(patsubst do-clean-%,%,$@) -q) #2>/dev/null
-
-#generic rule
 clean-container:
 	docker container rm -f $$(docker container ls -q -f ancestor=python-communicate)
 
@@ -46,26 +44,6 @@ run-gsc-docker: RUNDOCKERFLAGS += --device=/dev/sgx --volume=/var/run/aesmd/aesm
 run-gsc-docker:
 	docker run $(RUNDOCKERFLAGS) --net=testbridge --ip=$(TESTBRIDGE_SERVER) gsc-python-communicate-server & \
 	docker run $(RUNDOCKERFLAGS) --net=testbridge --env SERVERIP=$(TESTBRIDGE_SERVER) gsc-python-communicate-client
-
-#generic rule
-.PHONY: build-image-% build-gsc-unsigned-image-% build-gsc-image-%
-getbasename = $(patsubst build-image-%,%,$@)
-build-image-%: %.dockerfile
-	docker build -t $(getbasename) -f $(getbasename).dockerfile .
-
-getunsignedname = $(patsubst build-gsc-unsigned-image-%,%,$@)
-build-gsc-unsigned-image-%: build-image-%
-	cd gsc; ./gsc build $(GSCBUILDFLAGS) $(GSCFLAGS) $(getunsignedname) $(mkfile_path)/$(getunsignedname).manifest
-
-getgscbasename = $(patsubst build-gsc-image-%,%,$@)
-build-gsc-image-%: build-gsc-unsigned-image-%
-	mkdir -p signkey; openssl genrsa -3 -out signkey/$(getgscbasename)-key.pem 3072
-	cd gsc; ./gsc sign-image $(getgscbasename) $(mkfile_path)/signkey/$(getgscbasename)-key.pem $(GSCFLAGS)
-
-#end of generic rule
-
-GSCFLAGS := $(GSCFLAGS) -c $(mkfile_path)/config.yaml
-GSCBUILDFLAGS := 
 
 .PHONY: gsc-python-communicate
 gsc-python-communicate: GSCBUILDFLAGS += --insecure-args
