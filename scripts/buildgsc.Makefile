@@ -1,12 +1,8 @@
 
 #build rule
-.PHONY: build-image-% build-gsc-unsigned-image-% build-gsc-image-%
-getbasename = $(patsubst build-image-%,%,$@)
-build-image-%: %.dockerfile
-	docker build -t $(getbasename) -f $(getbasename).dockerfile .
-
+.PHONY: build-gsc-unsigned-image-% build-gsc-image-%
 getunsignedname = $(patsubst build-gsc-unsigned-image-%,%,$@)
-build-gsc-unsigned-image-%: build-image-%
+build-gsc-unsigned-image-%:
 	cd gsc; ./gsc build $(GSCBUILDFLAGS) $(GSCFLAGS) $(getunsignedname) $(mkfile_path)/$(getunsignedname).manifest
 
 getgscbasename = $(patsubst build-gsc-image-%,%,$@)
@@ -20,4 +16,3 @@ getcleanimagename = $(patsubst clean-image-%,%,$@)
 clean-image-%:
 	-docker image rm -f $$(docker image ls -f reference=gsc-$(getcleanimagename) -q) 2>/dev/null
 	-docker image rm -f $$(docker image ls -f reference=gsc-$(getcleanimagename)-unsigned -q) 2>/dev/null
-	-docker image rm -f $$(docker image ls -f reference=$(getcleanimagename) -q) #2>/dev/null
