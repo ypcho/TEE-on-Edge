@@ -1,0 +1,5 @@
+sgx.enclave_size = "4G"
+sgx.thread_num = 8
+
+# Config file
+sgx.trusted_files.config = "file:/configs/mosquitto_sub"

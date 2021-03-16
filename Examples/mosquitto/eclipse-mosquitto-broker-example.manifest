@@ -1,0 +1,5 @@
+sgx.enclave_size = "4G"
+sgx.thread_num = 8
+
+# Execution files
+sgx.trusted_files.idleconfig = "file:/mosquitto-no-auth.conf"
