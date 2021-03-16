@@ -62,10 +62,10 @@ gsc-python-communicate: GSCBUILDFLAGS += --insecure-args
 gsc-python-communicate: base-image-python-communicate build-gsc-image-python-communicate
 
 .PHONY: gsc-python-communicate-server
-gsc-python-communicate-server: base-image-python-communicate build-gsc-image-python-communicate-server
+gsc-python-communicate-server: base-image-python-communicate base-image-python-communicate-server build-gsc-image-python-communicate-server
 
 .PHONY: gsc-python-communicate-client
-gsc-python-communicate-client: base-image-python-communicate build-gsc-image-python-communicate-client
+gsc-python-communicate-client: base-image-python-communicate base-image-python-communicate-client build-gsc-image-python-communicate-client
 
 .PHONY: all
 all: gsc-python-communicate gsc-python-communicate-server gsc-python-communicate-client
