@@ -1,14 +1,15 @@
+gsc_path := $(abspath $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))/../graphene/Tools/gsc)
 
 #build rule
 .PHONY: build-gsc-unsigned-image-% build-gsc-image-%
 getunsignedname = $(patsubst build-gsc-unsigned-image-%,%,$@)
 build-gsc-unsigned-image-%:
-	cd gsc; ./gsc build $(GSCBUILDFLAGS) $(GSCFLAGS) $(getunsignedname) $(mkfile_path)/$(getunsignedname).manifest
+	cd $(gsc_path); ./gsc build $(GSCBUILDFLAGS) $(GSCFLAGS) $(getunsignedname) $(mkfile_path)/$(getunsignedname).manifest
 
 getgscbasename = $(patsubst build-gsc-image-%,%,$@)
 build-gsc-image-%: build-gsc-unsigned-image-%
 	mkdir -p signkey; openssl genrsa -3 -out signkey/$(getgscbasename)-key.pem 3072
-	cd gsc; ./gsc sign-image $(getgscbasename) $(mkfile_path)/signkey/$(getgscbasename)-key.pem $(GSCFLAGS)
+	cd $(gsc_path); ./gsc sign-image $(getgscbasename) $(mkfile_path)/signkey/$(getgscbasename)-key.pem $(GSCFLAGS)
 
 #clean rule
 .PHONY: clean-image-%
