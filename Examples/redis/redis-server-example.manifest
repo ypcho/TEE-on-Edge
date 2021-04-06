@@ -1,0 +1,8 @@
+sgx.enclave_size = "1G"
+sgx.thread_num = 8
+
+#redis manifest entries from the example
+#sys.enable_sigterm_injection = 1
+
+#file not captured in final manifest
+sgx.allowed_files.ethers = "file:/etc/ethers"
