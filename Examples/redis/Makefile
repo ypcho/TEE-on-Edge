@@ -11,7 +11,7 @@ include $(mkfile_path)/../../scripts/buildgsc.Makefile
 	clean-image clean-container \
 	clean-redis-%
 clean:
-	rm docker-entrypoint.sh redis-debian.dockerfile redis-ubuntu.dockerfile
+	rm -f docker-entrypoint.sh redis-debian.dockerfile redis-ubuntu.dockerfile
 
 clean-image: clean-redis-server-example
 	rm -rf signkey
