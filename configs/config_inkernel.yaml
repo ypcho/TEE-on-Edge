@@ -3,5 +3,5 @@ Graphene:
     Repository: "https://github.com/oscarlab/graphene.git"
     Branch: "master"
 SGXDriver:
-    Repository: 
+    Repository: # in-kernel driver needs no repository
     Branch: 
