@@ -31,11 +31,11 @@ base-image-%: %.dockerfile
 GITHUBRAW_URL := https://raw.githubusercontent.com/docker-library/redis/master
 
 docker-entrypoint.sh:
-	wget $(GITHUBRAW_URL)/6.2/docker-entrypoint.sh -O redis-debian.dockerfile
-	chmod a+x docker-entrypoint.sh
+	wget $(GITHUBRAW_URL)/6.2/docker-entrypoint.sh -O $@
+	chmod a+x $@
 
 redis-debian.dockerfile:
-	wget $(GITHUBRAW_URL)/6.2/Dockerfile -O redis-debian.dockerfile
+	wget $(GITHUBRAW_URL)/6.2/Dockerfile -O $@
 
 redis-ubuntu.dockerfile: redis-debian.dockerfile
 	sed -r -e 's/^FROM debian:.*/FROM ubuntu:18.04/' redis-debian.dockerfile > redis-ubuntu.dockerfile

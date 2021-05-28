@@ -3,8 +3,8 @@ gsc_path := $(abspath $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LI
 #build rule
 .PHONY: build-gsc-unsigned-image-% build-gsc-image-%
 getunsignedname = $(patsubst build-gsc-unsigned-image-%,%,$@)
-build-gsc-unsigned-image-%:
-	cd $(gsc_path); ./gsc build $(GSCBUILDFLAGS) $(GSCFLAGS) $(getunsignedname) $(mkfile_path)/$(getunsignedname).manifest
+build-gsc-unsigned-image-%: %.manifest
+	cd $(gsc_path); ./gsc build $(GSCBUILDFLAGS) $(GSCFLAGS) $(getunsignedname) $(mkfile_path)/$<
 
 getgscbasename = $(patsubst build-gsc-image-%,%,$@)
 build-gsc-image-%: build-gsc-unsigned-image-%
