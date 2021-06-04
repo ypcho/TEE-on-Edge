@@ -1,9 +1,0 @@
-/*.tar.gz
-/httpd
-/httpd-*/*
-/install/*
-/OUTPUT
-/pal_loader
-/result-*
-/ssl/ca.*
-/ssl/server.*
