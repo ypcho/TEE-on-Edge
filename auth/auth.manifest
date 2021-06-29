@@ -1,0 +1,7 @@
+sgx.enclave_size = "2G"
+sgx.thread_num = 32
+
+# Node.js requires eventfd2() emulation otherwise fails on `(uv_loop_init(&tracing_loop_)) == (0)'
+sys.insecure__allow_eventfd = 1
+
+sgx.trusted_files.workdir = "file:/workdir"
