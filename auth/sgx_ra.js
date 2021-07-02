@@ -376,6 +376,9 @@ function RAState(RA_config, emit, raabort, rasuccess){
 	this.emit = emit;
 	this.raabort = raabort;
 	this.rasuccess = rasuccess;
+
+	this.buffer = Buffer.alloc(0);
+	this.rastep = 1;
 }
 
 RAState.prototype.handle = function(data){

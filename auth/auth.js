@@ -52,11 +52,6 @@ const server = tls.createServer(creds,
 			state.nmessage = 0;
 			// Debug Log End
 
-			state.buffer = Buffer.alloc(0);
-
-			// assume AUTH command issued and is in RA state
-			state.rastep = 1;
-
 			socket.on("data", 
 				function(indata){
 					// Debug Log
