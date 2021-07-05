@@ -77,7 +77,7 @@ function command_DEL(DeviceID, ServiceID){
 }
 
 function command_COMMAND(state){
-	this.socket.write(to_resp(Object.keys(COMMAND)));
+	this.write(to_resp(Object.keys(COMMAND)));
 }
 
 var COMMAND = {
@@ -90,7 +90,7 @@ function HandleRequest(request, state){
 	console.log("received request:", to_resp(request).toString());
 
 	if(!(request instanceof Array) || request.length < 1){
-		socket.write(to_errorstring("ERROR COMMAND MUST BE AN ARRAY"));
+		state.write(to_errorstring("ERROR COMMAND MUST BE AN ARRAY"));
 		return;
 	}
 	var command = request[0].toString().toLowerCase();
@@ -98,7 +98,7 @@ function HandleRequest(request, state){
 	// check type error according to command
 	var action = COMMAND[command].action;
 	if(action) action.apply(state, request.slice(1));
-	else state.socket.write(to_errorstring("ERROR UNDEFINED COMMAND"));
+	else state.write(to_errorstring("ERROR UNDEFINED COMMAND"));
 }
 
 module.exports.HandleRequest = HandleRequest;

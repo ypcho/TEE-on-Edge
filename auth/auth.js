@@ -23,7 +23,6 @@ const server = tls.createServer(creds,
 				);
 
 			var state = {
-				socket: socket,
 				resp: new RedisParser({
 					returnReply: function(reply){
 						HandleRequest(reply, state);
@@ -34,6 +33,9 @@ const server = tls.createServer(creds,
 					},
 					returnBuffers: true,
 				}),
+				write: function(data){
+					socket.write(data);
+				}
 			};
 
 			socket.on("data", 
