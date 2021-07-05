@@ -1,7 +1,7 @@
 Distro: "ubuntu18.04"
 Graphene:
     Repository: "https://github.com/oscarlab/graphene.git"
-    Branch: "dbe2876630ef114ddac94e99ebaa140064a74262"
+    Branch: "2e737e69f076c60918f87d6829bb769925e75fec"
 SGXDriver:
     Repository: "https://github.com/intel/SGXDataCenterAttestationPrimitives"
     Branch: "dcap_1.9_reproducible && cd .. && mv linux-sgx-driver linux-sgx-driver-repo && mv linux-sgx-driver-repo/driver/linux linux-sgx-driver && rm -rf linux-sgx-driver-repo"
