@@ -1,30 +1,16 @@
 const fs = require("fs");
 const tls = require("tls");
-const crypto = require("crypto");
 
-const { RAState } = require("./sgx_ra");
+const RedisParser = require("redis-parser");
+const { to_errorstring } = require("./redis-format");
 
-const RA_config = {
-	quote_type: 0x0,
-	KDF_ID: 0x1,
-	Kpriv: fs.readFileSync("sp_ecdsa_priv.pem"),
-	Kpub: fs.readFileSync("sp_ecdsa_pub.pem"),
-	ias: {
-		url: "https://api.trustedservices.intel.com/",
-		path: "/sgx/dev",
-		key: JSON.parse(fs.readFileSync("iaskey.json")),
-		cert: new crypto.X509Certificate(fs.readFileSync("Intel_SGX_Attestation_RootCA.pem")),
-	},
-};
+const { HandleRequest } = require("./command");
 
 const port = 6380;
 
-var firstsock = null;
-var firstsockstate = null;
-
 const creds = {
-	key: fs.readFileSync("key.pem"),
-	cert: fs.readFileSync("cert.pem"),
+	key: fs.readFileSync("sp_rsa_priv.pem"),
+	cert: fs.readFileSync("sp_cert_rsa.crt"),
 	
 	// do not reject for testing
 	rejectUnauthorized: false,
@@ -36,40 +22,29 @@ const server = tls.createServer(creds,
 				socket.authorized ? "authorized" : "unauthorized" 
 				);
 
-			var state = new RAState(RA_config, 
-					function(data){ socket.write(data); }, 
-					function(){ console.log("Remote Attestation aborted", state); },
-					function(){ console.log("Remote Attestation successful", state); }
-				);
-
-			// Debug Log
-			if(firstsock === null){
-				firstsock = [];
-				firststate = state;
-				state.loglevel = true;
-			} else state.loglevel = false;
-
-			state.nmessage = 0;
-			// Debug Log End
+			var state = {
+				socket: socket,
+				resp: new RedisParser({
+					returnReply: function(reply){
+						HandleRequest(reply, state);
+					},
+					returnError: function(err){
+						socket.write(to_errorstring("ERROR PARSE INVALID"));
+						this.reset();
+					},
+					returnBuffers: true,
+				}),
+			};
 
 			socket.on("data", 
 				function(indata){
-					// Debug Log
-					var messageno = state.nmessage++;
-
-					if(state.loglevel){
-						firstsock.push(indata);
-						console.log(`message #${messageno} len ${indata.length} :`, indata);
-					}
-					// Debug Log
-
-					state.handle(indata);
+					state.resp.execute(indata);
 				}
 			);
 
 			socket.on("error",
 				function(error){
-					console.log("error", error);
+					console.error("error", error);
 				}
 			);
 		}
