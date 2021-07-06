@@ -7,9 +7,15 @@ build-gsc-unsigned-image-%: %.manifest
 	cd $(gsc_path); ./gsc build $(GSCBUILDFLAGS) $(GSCFLAGS) $(getunsignedname) $(mkfile_path)/$<
 
 getgscbasename = $(patsubst build-gsc-image-%,%,$@)
+
+ifndef signkey
 build-gsc-image-%: build-gsc-unsigned-image-%
 	mkdir -p signkey; openssl genrsa -3 -out signkey/$(getgscbasename)-key.pem 3072
-	cd $(gsc_path); ./gsc sign-image $(getgscbasename) $(mkfile_path)/signkey/$(getgscbasename)-key.pem $(GSCFLAGS)
+	cd $(gsc_path); ./gsc sign-image $(GSCFLAGS) $(getgscbasename) $(mkfile_path)/signkey/$(getgscbasename)-key.pem
+else
+build-gsc-image-%: build-gsc-unsigned-image-%
+	cd $(gsc_path); ./gsc sign-image $(GSCFLAGS) $(getgscbasename) $(signkey)
+endif
 
 #clean rule
 .PHONY: clean-image-%
