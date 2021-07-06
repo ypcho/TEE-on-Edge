@@ -9,22 +9,14 @@ sgx.trusted_files.key  = "file:/workdir/sp_rsa_priv.pem"
 
 # Log File
 sgx.allowed_files.log = "file:/workdir/redis-keyserver-log.log"
-sgx.allowed_files.rdb = "file:/workdir/redis-keyserver-dump.rdb"
+
+# Backup Database
+sgx.protected_files.rdb = "file:/workdir/redis-keyserver-dump.rdb"
 
 ################################## SIGNALS ####################################
 
 # Allow for injecting SIGTERM signal from the host.
 # sys.enable_sigterm_injection = true
-
-############################# SGX: TRUSTED FILES ###############################
-
-# Trusted no-library files include configuration files, read-only files, and
-# other static files. It is useful to specify such files here to make sure
-# they are not maliciously modified (modifications will be detected as hash
-# mismatch by Graphene-SGX).
-#
-# Redis by default does not use configuration files, so this section is empty.
-sgx.trusted_files.config = "file:/workdir/redis-keyserver.conf"
 
 ############################# SGX: ALLOWED FILES ###############################
 
