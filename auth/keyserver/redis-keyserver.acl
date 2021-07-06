@@ -1,0 +1,2 @@
+user default off #37a8eec1ce19687d132fe29051dca629d164e2c4958ba141d5f4133a33f0688f resetkeys resetchannels nocommands
+user admin on #1a43e85842b0020c7444059a0f81bd3eb047160e638319ecb69c275d554a67b0 ~* &* +@all
