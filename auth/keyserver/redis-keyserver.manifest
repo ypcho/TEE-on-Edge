@@ -4,11 +4,8 @@ sgx.thread_num = 8
 # Config File
 sgx.trusted_files.conf = "file:/workdir/redis-keyserver.conf"
 sgx.trusted_files.acl  = "file:/workdir/redis-keyserver.acl"
-sgx.trusted_files.cert = "file:/workdir/sp_cert_rsa.crt"
-sgx.trusted_files.key  = "file:/workdir/sp_rsa_priv.pem"
-
-# Log File
-sgx.allowed_files.log = "file:/workdir/redis-keyserver-log.log"
+sgx.trusted_files.cert = "file:/workdir/sp_cert.crt"
+sgx.trusted_files.key  = "file:/workdir/sp_cert_key.pem"
 
 # Backup Database
 sgx.protected_files.rdb = "file:/workdir/redis-keyserver-dump.rdb"

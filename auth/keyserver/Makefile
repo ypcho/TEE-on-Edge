@@ -3,7 +3,7 @@ mkfile_path := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 GSCFLAGS :=$(GSCFLAGS) -c $(mkfile_path)/config.yaml
 GSCBUILDFLAGS := 
 
-signkey := $(abspath ../sp_signer_priv.pem)
+signkey := $(abspath ../sp_signer_key.pem)
 
 include $(mkfile_path)/../../scripts/buildgsc.Makefile
 
