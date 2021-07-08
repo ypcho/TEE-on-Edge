@@ -145,7 +145,7 @@ function ias_query_verify(quote_raw, callback_reply, callback_error){
 
 			var quote = Buffer.from(iasverify.isvEnclaveQuoteBody, "base64");
 
-			callback_reply(quote, certpem, sign, warning);
+			callback_reply(fulldat, certpem, sign, warning);
 
 		});
 	});
@@ -168,5 +168,37 @@ function ias_query_verify(quote_raw, callback_reply, callback_error){
 
 }
 
+function ias_verify(quotedat, certpem, sign){
+	var cert = new crypto.X509Certificate(certpem);
+
+	if(!cert.verify(RA_config.ias.cert.publicKey)
+	|| !crypto.verify("RSA-SHA256", quotedat, cert.publicKey, sign)){
+		state.raabort();
+		return;
+	}
+
+	var iasverify = JSON.parse(quotedat);
+
+	switch(iasverify.isvEnclaveQuoteStatus){
+		default: {
+			return false;
+		}
+			break;
+
+		case "GROUP_OUT_OF_DATE":
+		case "CONFIGURATION_NEEDED":
+		case "SW_HARDENING_NEEDED":
+		case "CONFIGURATION_AND_SW_HARDENING_NEEDED":
+			console.warn(`isvEnclaveQuoteStatus is ${iasverify.isvEnclaveQuoteStatus}.`);
+		case "OK":
+			break;
+	}
+
+	var quote = Buffer.from(iasverify.isvEnclaveQuoteBody, "base64");
+	
+	return true;
+}
+
 module.exports.ias_query_sigrl = ias_query_sigrl;
 module.exports.ias_query_verify = ias_query_verify;
+module.exports.ias_verify = ias_verify;
