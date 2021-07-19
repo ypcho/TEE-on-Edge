@@ -4,4 +4,18 @@ sgx.thread_num = 32
 # Node.js requires eventfd2() emulation otherwise fails on `(uv_loop_init(&tracing_loop_)) == (0)'
 sys.insecure__allow_eventfd = 1
 
-sgx.trusted_files.workdir = "file:/workdir"
+sgx.trusted_files.node_modules = "file:/workdir/node_modules"
+#sgx.trusted_files.npm_package_json = "file:/workdir/package.json"
+#sgx.trusted_files.npm_package_lock_json = "file:/workdir/package-lock.json"
+
+sgx.trusted_files.scripts_auth = "file:/workdir/auth.js"
+sgx.trusted_files.scripts_command = "file:/workdir/command.js"
+sgx.trusted_files.scripts_redis_format = "file:/workdir/redis-format.js"
+sgx.trusted_files.scripts_ias = "file:/workdir/ias.js"
+#sgx.trusted_files.scripts_sgx_ra = "file:/workdir/sgx_ra.js"
+
+sgx.trusted_files.cert = "file:/workdir/sp_cert.crt"
+sgx.trusted_files.key = "file:/workdir/sp_cert_key.pem"
+
+sgx.trusted_files.ias_cert = "file:/workdir/Intel_SGX_Attestation_RootCA.pem"
+sgx.trusted_files.config = "file:/workdir/config.json"
