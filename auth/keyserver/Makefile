@@ -1,7 +1,7 @@
 mkfile_path := $(patsubst %/, %, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 GSCFLAGS :=$(GSCFLAGS) -c $(mkfile_path)/config.yaml
-GSCBUILDFLAGS := 
+GSCBUILDFLAGS += 
 
 signkey := $(abspath ../sp_signer_key.pem)
 

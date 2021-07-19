@@ -1,5 +1,6 @@
 sgx.enclave_size = "4G"
 sgx.thread_num = 8
+sgx.pal_internal_mem_size = "1G"
 
 # Config File
 sgx.trusted_files.conf = "file:/workdir/redis-keyserver.conf"
@@ -8,7 +9,8 @@ sgx.trusted_files.cert = "file:/workdir/sp_cert.crt"
 sgx.trusted_files.key  = "file:/workdir/sp_cert_key.pem"
 
 # Backup Database
-sgx.protected_files.rdb = "file:/workdir/redis-keyserver-dump.rdb"
+sgx.protected_files_key = "0123456789abcdef0123456789abcdef"
+sgx.protected_files.aof = "file:/workdir/database/"
 
 ################################## SIGNALS ####################################
 
