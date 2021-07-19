@@ -9,20 +9,25 @@ const { HandleRequest } = require("./command");
 const port = 6380;
 
 const creds = {
-	key: fs.readFileSync("sp_rsa_priv.pem"),
-	cert: fs.readFileSync("sp_cert_rsa.crt"),
+	key: fs.readFileSync("sp_cert_key.pem"),
+	cert: fs.readFileSync("sp_cert.crt"),
 	
-	// do not reject for testing
+	// later verified
 	rejectUnauthorized: false,
+	requestCert: true,
 };
+
+var last;
 
 const server = tls.createServer(creds,
 		function(socket){
 			console.log("server connected",
 				socket.authorized ? "authorized" : "unauthorized" 
 				);
+			last = socket;
 
 			var state = {
+				socket: socket,
 				resp: new RedisParser({
 					returnReply: function(reply){
 						HandleRequest(reply, state);

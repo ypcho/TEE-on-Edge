@@ -2,11 +2,13 @@ const fs = require("fs");
 const crypto = require("crypto");
 const https = require("https");
 
+const config = JSON.parse(fs.readFileSync("config.json"));
+
 const RA_config = {
 	ias: {
 		url: "https://api.trustedservices.intel.com/",
 		path: "/sgx/dev",
-		key: JSON.parse(fs.readFileSync("iaskey.json")),
+		key: config.ias,
 		cert: new crypto.X509Certificate(fs.readFileSync("Intel_SGX_Attestation_RootCA.pem")),
 	},
 };
@@ -101,12 +103,12 @@ function ias_query_verify(quote_raw, callback_reply, callback_error){
 			var iasverify = JSON.parse(fulldat);
 
 			var certpem = decodeURIComponent(res.headers['x-iasreport-signing-certificate']);
-			var sign = Buffer.from(res.headers['x-iasreport-signature'], "base64");
+			var sign = res.headers['x-iasreport-signature'];
 			
 			var cert = new crypto.X509Certificate(certpem);
 
 			if(!cert.verify(RA_config.ias.cert.publicKey)
-			|| !crypto.verify("RSA-SHA256", fulldat, cert.publicKey, sign)){
+			|| !crypto.verify("RSA-SHA256", fulldat, cert.publicKey, Buffer.from(sign, "base64"))){
 				callback_error("invalid signature");
 				return;
 			}
@@ -146,7 +148,6 @@ function ias_query_verify(quote_raw, callback_reply, callback_error){
 			var quote = Buffer.from(iasverify.isvEnclaveQuoteBody, "base64");
 
 			callback_reply(fulldat, certpem, sign, warning);
-
 		});
 	});
 
@@ -172,7 +173,7 @@ function ias_verify(quotedat, certpem, sign){
 	var cert = new crypto.X509Certificate(certpem);
 
 	if(!cert.verify(RA_config.ias.cert.publicKey)
-	|| !crypto.verify("RSA-SHA256", quotedat, cert.publicKey, sign)){
+	|| !crypto.verify("RSA-SHA256", quotedat, cert.publicKey, Buffer.from(sign, "base64"))){
 		state.raabort();
 		return;
 	}

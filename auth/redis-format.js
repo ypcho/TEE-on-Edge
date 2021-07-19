@@ -81,15 +81,27 @@ function _to_array(arr){
 	return Buffer.concat(arrbuf);
 }
 
+const resp_null = Buffer.from("$-1\r\n");
+
 function to_resp(obj){
-	if(obj instanceof Array){
-		return _to_array(obj.map(to_resp));
-	} else if((obj instanceof Buffer) || (obj instanceof String))
-		return _to_bulkstring(obj);
-	else if(Number.isInteger(obj))
-		return _to_integer(obj);
-	else
-		return _to_bulkstring(obj.toString());
+	try{
+		if(obj instanceof Array){
+			return _to_array(obj.map(to_resp));
+		} else if((obj instanceof Buffer) || (obj instanceof String))
+			return _to_bulkstring(obj);
+		else if(Number.isInteger(obj))
+			return _to_integer(obj);
+		else if(obj === null)
+			return resp_null;
+		else
+			return _to_bulkstring(obj.toString());
+	} catch(err){
+		console.error("to_resp on object caused error", obj);
+		if(err instanceof TypeError)
+			return resp_null;
+
+		else throw err;
+	}
 }
 
 module.exports.to_errorstring = _to_errorstring;
