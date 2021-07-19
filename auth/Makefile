@@ -13,7 +13,6 @@ include $(mkfile_path)/../scripts/buildgsc.Makefile
 	clean-image clean-container \
 	clean-auth
 clean:
-	rm -f docker-entrypoint.sh redis-debian.dockerfile redis-ubuntu.dockerfile
 
 clean-image: clean-auth
 
