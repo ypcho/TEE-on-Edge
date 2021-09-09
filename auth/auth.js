@@ -18,11 +18,14 @@ const creds = {
 };
 
 var last;
+var connid = 0;
 
 const server = tls.createServer(creds,
 		function(socket){
-			console.log("server connected",
-				socket.authorized ? "authorized" : "unauthorized" 
+			console.log(`connection ${connid} established`,
+				socket.authorized ? "authorized" : "unauthorized",
+				"with certificate",
+				JSON.stringify(socket.getPeerCertificate())
 				);
 			last = socket;
 
@@ -40,11 +43,14 @@ const server = tls.createServer(creds,
 				}),
 				write: function(data){
 					socket.write(data);
-				}
+				}, 
+				connid: connid++,
 			};
 
 			socket.on("data", 
 				function(indata){
+					console.error(`received data from conn ${state.connid}:`, 
+						JSON.stringify(indata.toString()));
 					state.resp.execute(indata);
 				}
 			);

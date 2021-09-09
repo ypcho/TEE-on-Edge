@@ -17,11 +17,17 @@ const redisoptions = {
 	user: "admin",
 	password: "defaultpassword",
 	tls: {
-		ca: fs.readFileSync("sp_cert.crt"),
+		ca: fs.readFileSync("sp_cert_ca.crt"),
+	},
+	retry_strategy: function(options){
+		console.log("redis connection error: retrying after 3 seconds");
+		return 3000;
 	},
 };
 
 const client = redis.createClient(redisoptions);
+
+client.on("error", console.error);
 
 const globaloptions = {
 	passwordharden: false,
@@ -62,7 +68,6 @@ function decode(ID){
 		ias_report_signature_oid: "1.2.840.113741.1337.5",
 	};
 	function verify_cert(certobj){
-		console.log(certobj);
 		let peercert = forge.pki.certificateFromPem((new crypto.X509Certificate(certobj.raw)).toString())
 
 		let extensions = peercert.extensions;
@@ -195,7 +200,7 @@ var COMMAND = {
 };
 
 function HandleRequest(request, state){
-	console.log("received request:", to_resp(request).toString());
+	console.error(`received request from conn ${state.connid}:`, JSON.stringify(to_resp(request).toString()));
 
 	if(!(request instanceof Array) || request.length < 1){
 		state.write(to_errorstring("ERR COMMAND MUST BE AN ARRAY"));
