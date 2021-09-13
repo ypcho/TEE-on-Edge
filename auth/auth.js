@@ -81,28 +81,35 @@ const server = tls.createServer(creds,
 
 			var work = new Promise(
 				function(resolve, reject){
-					ias.verify_cert(socket.getPeerCertificate(),
-						function(warn){
-							console.log(`connection ${connid} certificate successfully verified`);
-							if(warn){
-								console.log(`connection ${state.connid} certificate received ias warning:`, warn);
+					try{
+						ias.verify_cert(socket.getPeerCertificate(),
+							function(warn){
+								console.log(`connection ${connid} certificate successfully verified`);
+								if(warn){
+									console.log(`connection ${state.connid} certificate received ias warning:`, warn);
+								}
+								//success
+								resolve();
+							},
+							function(err){
+								console.log(`connection ${state.connid} ra verification failed:`, err);
+								console.log(`closing connection ${state.connid}`);
+
+								socket.write(to_errorstring("ERR invalid certificate"));
+								socket.end();
+
+								// failure
+								// end of promise chain
+								// warning: do not resolve or reject to clear promise chain
+								// reference: https://stackoverflow.com/questions/20068467/does-never-resolved-promise-cause-memory-leak
 							}
-							//success
-							resolve();
-						},
-						function(err){
-							console.log(`connection ${state.connid} ra verification failed:`, err);
-							console.log(`closing connection ${state.connid}`);
-
-							socket.write(to_errorstring("ERR invalid certificate"));
-							socket.end();
-
-							// failure
-							// end of promise chain
-							// warning: do not resolve or reject to clear promise chain
-							// reference: https://stackoverflow.com/questions/20068467/does-never-resolved-promise-cause-memory-leak
-						}
-					);
+						);
+					} catch(err){
+						// warning: do not resolve or reject to clear promise chain
+						
+						console.log(`connection ${state.connid} ra verification failed:`, err);
+						console.log(`closing connection ${state.connid}`);
+					}
 				}
 			);
 
