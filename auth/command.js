@@ -15,6 +15,7 @@ const redisoptions = {
 	user: "admin",
 	password: "defaultpassword",
 	tls: {
+		rejectUnauthorized: false, // set for evaluation
 		ca: fs.readFileSync("sp_cert_ca.crt"),
 	},
 	retry_strategy: function(options){
