@@ -1,0 +1,30 @@
+--- wolfMQTT/src/mqtt_packet.c	2021-10-02 23:07:17.277996200 +0900
++++ libraries/wolfMQTT/src/mqtt_packet.c	2021-10-02 23:43:11.907468000 +0900
+@@ -216,23 +216,19 @@
+  * buf_len is the max number of bytes in buf */
+ int MqttDecode_Vbi(byte *buf, word32 *value, word32 buf_len)
+ {
+-    word32 rc = 0;
+-    int multiplier = 1;
++    unsigned rc = 0;
++    word32 multiplier = 1;
+     byte encodedByte;
+ 
+     *value = 0;
+     do {
+         if (buf_len < rc + 1)
+             return MQTT_CODE_ERROR_OUT_OF_BUFFER;
++		if (rc >= 4)
++            return MQTT_CODE_ERROR_MALFORMED_DATA;
+        encodedByte = *(buf++);
+        *value += (encodedByte & ~MQTT_PACKET_LEN_ENCODE_MASK) * multiplier;
+        multiplier *= MQTT_PACKET_LEN_ENCODE_MASK;
+-       if (multiplier > (MQTT_PACKET_LEN_ENCODE_MASK *
+-                         MQTT_PACKET_LEN_ENCODE_MASK *
+-                         MQTT_PACKET_LEN_ENCODE_MASK))
+-       {
+-          return MQTT_CODE_ERROR_MALFORMED_DATA;
+-       }
+        rc++;
+     } while ((encodedByte & MQTT_PACKET_LEN_ENCODE_MASK) != 0);
+ 
