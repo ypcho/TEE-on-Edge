@@ -1,4 +1,4 @@
-FROM node:bionic
+FROM node
 
 WORKDIR /workdir
 
