@@ -26,6 +26,8 @@ sgx.protected_files.aof = "file:/workdir/database/"
 # Name Service Switch (NSS) files. Glibc reads these files as part of name-
 # service information gathering. For more info, see 'man nsswitch.conf'.
 sgx.allowed_files.nsswitch = "file:/etc/nsswitch.conf"
+sgx.allowed_files.hostconf = "file:/etc/host.conf"
+sgx.allowed_files.resolvconf = "file:/etc/resolv.conf"
 sgx.allowed_files.ethers = "file:/etc/ethers"
 sgx.allowed_files.hosts = "file:/etc/hosts"
 sgx.allowed_files.group = "file:/etc/group"
