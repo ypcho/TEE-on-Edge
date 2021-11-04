@@ -17,6 +17,8 @@ sgx.trusted_files.scripts_ias = "file:/workdir/ias.js"
 sgx.trusted_files.cert = "file:/workdir/sp_cert.crt"
 sgx.trusted_files.key = "file:/workdir/sp_cert_key.pem"
 
+sgx.trusted_files.certca = "file:/workdir/sp_cert_ca.crt"
+
 sgx.trusted_files.ias_cert = "file:/workdir/Intel_SGX_Attestation_RootCA.pem"
 sgx.trusted_files.config = "file:/workdir/config.json"
 
