@@ -1,7 +1,6 @@
 
 const fs = require("fs");
 const crypto = require("crypto");
-const forge = require("node-forge");
 
 const { to_resp, to_errorstring } = require("./redis-format");
 

@@ -2,7 +2,8 @@ const fs = require("fs");
 const crypto = require("crypto");
 const https = require("https");
 
-const forge = require("node-forge");
+//const forge = require("node-forge");
+const rs = require("jsrsasign");
 
 const config = JSON.parse(fs.readFileSync("config.json"));
 
@@ -140,7 +141,7 @@ function ias_query_verify(quote_raw, callback_reply, callback_error){
 				}
 			}
 
-			if(!cert.verify(RA_config.ias.cert.publicKey)
+			if(!cert.verify(certca.publicKey)
 			|| !crypto.verify("RSA-SHA256", fulldat, cert.publicKey, Buffer.from(sign, "base64"))){
 				callback_error("invalid signature");
 				return;
@@ -160,7 +161,7 @@ function ias_query_verify(quote_raw, callback_reply, callback_error){
 				return;
 			}
 
-			var warning;
+			var warnmsg;
 
 			switch(iasverify.isvEnclaveQuoteStatus){
 				default: {
@@ -173,14 +174,14 @@ function ias_query_verify(quote_raw, callback_reply, callback_error){
 				case "CONFIGURATION_NEEDED":
 				case "SW_HARDENING_NEEDED":
 				case "CONFIGURATION_AND_SW_HARDENING_NEEDED":
-					warning = `isvEnclaveQuoteStatus is ${iasverify.isvEnclaveQuoteStatus}.`;
+					warnmsg = `isvEnclaveQuoteStatus is ${iasverify.isvEnclaveQuoteStatus}.`;
 				case "OK":
 					break;
 			}
 
 			var quote = Buffer.from(iasverify.isvEnclaveQuoteBody, "base64");
 
-			callback_reply(fulldat, certpem, sign, certcapem, warning);
+			callback_reply(fulldat, certpem, sign, certcapem, warnmsg);
 		});
 	});
 
@@ -217,7 +218,7 @@ function ias_verify(report, certpem, sign, certcapem){
 			certca = newcertca;
 	}
 
-	if(!cert.verify(RA_config.ias.cert.publicKey)
+	if(!cert.verify(certca.publicKey)
 	|| !crypto.verify("RSA-SHA256", report, cert.publicKey, Buffer.from(sign, "base64"))){
 		return false;
 	}
@@ -244,13 +245,84 @@ function ias_verify(report, certpem, sign, certcapem){
 	return true;
 }
 
+function cert_pubkey_hash(cert){
+	var keyobj = cert.getPublicKey();
+	var pubkeybuf;
+	if(keyobj instanceof rs.RSAKey){
+		// RSA Key
+		pubkeybuf = Buffer.from(cert.getPublicKeyHex(), "hex");
+	} else if(keyobj.type === "EC"){
+		// EC Key
+		pubkeybuf = Buffer.from(keyobj.pubKeyHex, "hex");
+	}
+
+	return crypto.createHash("SHA256").update(pubkeybuf).digest();
+}
+
+function extract_quote_user_data(quotedat){
+	var reportjson = JSON.parse(quotedat);
+	var quotebody = Buffer.from(reportjson.isvEnclaveQuoteBody, "base64");
+
+	return quotebody.subarray(368, 432);
+}
+
 {
+	let getExtensionParamRaw = function(hExt) {
+		var _ASN1HEX = rs.ASN1HEX;
+
+		var result = {};
+		var aIdx = _ASN1HEX.getChildIdx(hExt, 0);
+		var aIdxLen = aIdx.length;
+		if (aIdxLen != 2 && aIdxLen != 3)
+			throw new Error("wrong number elements in Extension: " + 
+					aIdxLen + " " + hExt);
+
+		var oid = _ASN1HEX.hextooidstr(_ASN1HEX.getVbyList(hExt, 0, [0], "06"));
+
+		var critical = false;
+		if (aIdxLen == 3 && _ASN1HEX.getTLVbyList(hExt, 0, [1]) == "0101ff")
+			critical = true;
+
+		var hExtV = _ASN1HEX.getVbyList(hExt, 0, [aIdxLen - 1]);
+
+		var privateParam = { extname: oid, extn: hExtV };
+		if (critical) privateParam.critical = true;
+		return privateParam;
+	};
+
+	let getExtensionParamRawArray = function(){
+			var _ASN1HEX = rs.ASN1HEX;
+
+			// for X.509v3 certificate
+			var idx1 = _ASN1HEX.getIdxbyListEx(this.hex, 0, [0, "[3]"]);
+			if (idx1 != -1) {
+				hExtSeq = _ASN1HEX.getTLVbyListEx(this.hex, 0, [0, "[3]", 0], "30");
+			}
+			
+			var result = [];
+			var aIdx = _ASN1HEX.getChildIdx(hExtSeq, 0);
+			
+			for(var i = 0; i < aIdx.length; i++) {
+				var hExt = _ASN1HEX.getTLV(hExtSeq, aIdx[i]);
+				var extParam = getExtensionParamRaw(hExt);
+				if(extParam !== null) result.push(extParam);
+			}
+			
+			return result;
+	}
+
 	const oid_ra_tls = {
 		ias_response_body_oid: "0.6.9.42.840.113741.1337.2",
 		ias_root_cert_oid: "0.6.9.42.840.113741.1337.3",
 		ias_leaf_cert_oid: "0.6.9.42.840.113741.1337.4",
 		ias_report_signature_oid: "0.6.9.42.840.113741.1337.5",
 		quote_oid: "0.6.9.42.840.113741.1337.6",
+
+		ias_response_body_oid_sim: "1.2.840.113741.1337.2",
+		ias_root_cert_oid_sim: "1.2.840.113741.1337.3",
+		ias_leaf_cert_oid_sim: "1.2.840.113741.1337.4",
+		ias_report_signature_oid_sim: "1.2.840.113741.1337.5",
+		quote_oid_sim: "1.2.840.113741.1337.6",
 	};
 	// callback_success( warning_message )
 	// callback_fail( error_message )
@@ -260,13 +332,16 @@ function ias_verify(report, certpem, sign, certcapem){
 			return;
 		}
 
-		let peercert = forge.pki.certificateFromAsn1(
-			forge.asn1.fromDer(
-				certobj.raw.toString("binary")
-			)
-		);
+		let peercert = new rs.X509();
+		peercert.readCertHex(certobj.raw.toString("hex"));
 
-		let extensions = peercert.extensions;
+//		forge.pki.certificateFromAsn1(
+//			forge.asn1.fromDer(
+//				certobj.raw.toString("binary")
+//			)
+//		);
+
+		let extensions = getExtensionParamRawArray.call(peercert);
 		if(!extensions) return false;
 
 		let quotedat;
@@ -275,25 +350,38 @@ function ias_verify(report, certpem, sign, certcapem){
 		let certca;
 
 		for(let ext of extensions){
-			let value = Buffer.from(ext.value, "binary");
-			switch(ext.id){
+			let value = Buffer.from(ext.extn, "hex");
+			switch(ext.extname){
+				case oid_ra_tls.ias_response_body_oid_sim:
 				case oid_ra_tls.ias_response_body_oid: {
 					quotedat = value;
 				} break;
+				case oid_ra_tls.ias_root_cert_oid_sim:
 				case oid_ra_tls.ias_root_cert_oid: {
 					certca = value;
 				} break;
+				case oid_ra_tls.ias_leaf_cert_oid_sim:
 				case oid_ra_tls.ias_leaf_cert_oid: {
 					cert = value;
 				} break;
+				case oid_ra_tls.ias_report_signature_oid_sim:
 				case oid_ra_tls.ias_report_signature_oid: {
-					signature = value;
+					signature = Buffer.from(value.toString(), "base64");
 				} break;
+				case oid_ra_tls.quote_oid_sim:
 				case oid_ra_tls.quote_oid: {
 					// make synchronous
 					ias_query_verify(value, 
 						function(quotedat, certpem, sign, certca, warning){
-							callback_success(warning)
+							if(cert_pubkey_hash(peercert).equals(
+								extract_quote_user_data(quotedat).subarray(0, 32)
+							)){
+								callback_success(warning)
+								return;
+							} else{
+								callback_fail("invalid user data");
+								return;
+							}
 						}, 
 						callback_fail
 					);
@@ -309,9 +397,16 @@ function ias_verify(report, certpem, sign, certcapem){
 		}
 
 		if(ias_verify(quotedat, cert, signature, certca)){
-			callback_success();
-			return;
-		} else{
+			if(cert_pubkey_hash(peercert).equals(
+				extract_quote_user_data(quotedat).subarray(0, 32)
+			)){
+				callback_success();
+				return;
+			} else{
+				callback_fail("invalid user data");
+				return;
+			}
+		} else {
 			callback_fail("invalid quote");
 			return;
 		}

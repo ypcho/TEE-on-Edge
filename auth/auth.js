@@ -95,8 +95,10 @@ const server = tls.createServer(creds,
 								console.log(`connection ${state.connid} ra verification failed:`, err);
 								console.log(`closing connection ${state.connid}`);
 
-								socket.write(to_errorstring("ERR invalid certificate"));
-								socket.end();
+								if(socket.readyState === socket.OPEN){
+									socket.write(to_errorstring("ERR invalid certificate"));
+									socket.end();
+								}
 
 								// failure
 								// end of promise chain

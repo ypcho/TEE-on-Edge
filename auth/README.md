@@ -31,7 +31,8 @@ The port of the corresponding redis server is `6379` by default. You may change 
 
 ### Requirements
  * `node` : tested in `v16.2.0`
- * npm modules : `redis`, `redis-parser`, `node-forge`
+ * npm modules : `redis`, `redis-parser`, `jsrsasign`
+ * switched from `node-forge` to `jsrsasign` for elliptical curve cryptography support
 
 ### Launching in shell
 
