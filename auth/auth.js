@@ -26,9 +26,9 @@ const server = tls.createServer(creds,
 			var connid = connid_counter++;
 			
 			console.log(`connection ${connid} established`,
-				socket.authorized ? "authorized" : "unauthorized",
-				"with certificate",
-				JSON.stringify(socket.getPeerCertificate())
+				//socket.authorized ? "authorized" : "unauthorized",
+				"with certificate\n" +
+				String(socket.getPeerX509Certificate())
 				);
 			last = socket;
 
