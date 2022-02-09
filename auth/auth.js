@@ -81,6 +81,7 @@ const server = tls.createServer(creds,
 
 			var work = new Promise(
 				function(resolve, reject){
+
 					try{
 						ias.verify_cert(socket.getPeerCertificate(),
 							function(warn){
@@ -97,7 +98,7 @@ const server = tls.createServer(creds,
 
 								if(socket.readyState === socket.OPEN){
 									socket.write(to_errorstring("ERR invalid certificate"));
-									socket.end();
+									socket.destroy();
 								}
 
 								// failure
